@@ -5115,6 +5115,20 @@
   && !TARGET_REALLY_IWMMXT \
   && ! (V2DImode == V2DImode && TARGET_HAVE_MVE) \
   && !BYTES_BIG_ENDIAN)
+#define HAVE_vec_initv8qiqi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V8QImode)))
+#define HAVE_vec_initv16qiqi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V16QImode)))
+#define HAVE_vec_initv4hihi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V4HImode)))
+#define HAVE_vec_initv8hihi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V8HImode)))
+#define HAVE_vec_initv2sisi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V2SImode)))
+#define HAVE_vec_initv4sisi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V4SImode)))
+#define HAVE_vec_initv4hfhf (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V4HFmode)))
+#define HAVE_vec_initv8hfhf (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V8HFmode)))
+#define HAVE_vec_initv4bfbf (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V4BFmode)))
+#define HAVE_vec_initv8bfbf (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V8BFmode)))
+#define HAVE_vec_initv2sfsf (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V2SFmode)))
+#define HAVE_vec_initv4sfsf (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V4SFmode)))
+#define HAVE_vec_initdidi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (DImode)))
+#define HAVE_vec_initv2didi (TARGET_NEON || (TARGET_HAVE_MVE && VALID_MVE_MODE (V2DImode)))
 #define HAVE_iwmmxt_setwcgr0 (TARGET_REALLY_IWMMXT)
 #define HAVE_iwmmxt_setwcgr1 (TARGET_REALLY_IWMMXT)
 #define HAVE_iwmmxt_setwcgr2 (TARGET_REALLY_IWMMXT)
@@ -5149,17 +5163,6 @@
 #define HAVE_movv4hf (TARGET_NEON)
 #define HAVE_movv4bf (TARGET_NEON)
 #define HAVE_movv8bf (TARGET_NEON)
-#define HAVE_vec_initv8qiqi (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv16qiqi (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv4hihi (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv8hihi (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv2sisi (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv4sisi (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv4hfhf (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv8hfhf (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv2sfsf (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv4sfsf (TARGET_NEON || TARGET_HAVE_MVE)
-#define HAVE_vec_initv2didi (TARGET_NEON || TARGET_HAVE_MVE)
 #define HAVE_divv2sf3 (TARGET_NEON && !optimize_size \
    && flag_reciprocal_math)
 #define HAVE_divv4sf3 (TARGET_NEON && !optimize_size \
@@ -10660,6 +10663,20 @@ extern rtx        gen_vec_unpacku_lo_v4si                            (rtx, rtx);
 extern rtx        gen_vec_pack_trunc_v8hi                            (rtx, rtx, rtx);
 extern rtx        gen_vec_pack_trunc_v4si                            (rtx, rtx, rtx);
 extern rtx        gen_vec_pack_trunc_v2di                            (rtx, rtx, rtx);
+extern rtx        gen_vec_initv8qiqi                                 (rtx, rtx);
+extern rtx        gen_vec_initv16qiqi                                (rtx, rtx);
+extern rtx        gen_vec_initv4hihi                                 (rtx, rtx);
+extern rtx        gen_vec_initv8hihi                                 (rtx, rtx);
+extern rtx        gen_vec_initv2sisi                                 (rtx, rtx);
+extern rtx        gen_vec_initv4sisi                                 (rtx, rtx);
+extern rtx        gen_vec_initv4hfhf                                 (rtx, rtx);
+extern rtx        gen_vec_initv8hfhf                                 (rtx, rtx);
+extern rtx        gen_vec_initv4bfbf                                 (rtx, rtx);
+extern rtx        gen_vec_initv8bfbf                                 (rtx, rtx);
+extern rtx        gen_vec_initv2sfsf                                 (rtx, rtx);
+extern rtx        gen_vec_initv4sfsf                                 (rtx, rtx);
+extern rtx        gen_vec_initdidi                                   (rtx, rtx);
+extern rtx        gen_vec_initv2didi                                 (rtx, rtx);
 extern rtx        gen_iwmmxt_setwcgr0                                (rtx);
 extern rtx        gen_iwmmxt_setwcgr1                                (rtx);
 extern rtx        gen_iwmmxt_setwcgr2                                (rtx);
@@ -10694,17 +10711,6 @@ extern rtx        gen_movxi                                          (rtx, rtx);
 extern rtx        gen_movv4hf                                        (rtx, rtx);
 extern rtx        gen_movv4bf                                        (rtx, rtx);
 extern rtx        gen_movv8bf                                        (rtx, rtx);
-extern rtx        gen_vec_initv8qiqi                                 (rtx, rtx);
-extern rtx        gen_vec_initv16qiqi                                (rtx, rtx);
-extern rtx        gen_vec_initv4hihi                                 (rtx, rtx);
-extern rtx        gen_vec_initv8hihi                                 (rtx, rtx);
-extern rtx        gen_vec_initv2sisi                                 (rtx, rtx);
-extern rtx        gen_vec_initv4sisi                                 (rtx, rtx);
-extern rtx        gen_vec_initv4hfhf                                 (rtx, rtx);
-extern rtx        gen_vec_initv8hfhf                                 (rtx, rtx);
-extern rtx        gen_vec_initv2sfsf                                 (rtx, rtx);
-extern rtx        gen_vec_initv4sfsf                                 (rtx, rtx);
-extern rtx        gen_vec_initv2didi                                 (rtx, rtx);
 extern rtx        gen_divv2sf3                                       (rtx, rtx, rtx);
 extern rtx        gen_divv4sf3                                       (rtx, rtx, rtx);
 extern rtx        gen_neon_vabsv8hf                                  (rtx, rtx);
