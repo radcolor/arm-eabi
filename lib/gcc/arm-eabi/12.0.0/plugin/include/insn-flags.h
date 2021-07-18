@@ -5384,6 +5384,8 @@
 #define HAVE_udot_prodv8qi (TARGET_DOTPROD)
 #define HAVE_sdot_prodv16qi (TARGET_DOTPROD)
 #define HAVE_udot_prodv16qi (TARGET_DOTPROD)
+#define HAVE_usdot_prodv8qi (TARGET_I8MM)
+#define HAVE_usdot_prodv16qi (TARGET_I8MM)
 #define HAVE_neon_copysignfv2sf (TARGET_NEON)
 #define HAVE_neon_copysignfv4sf (TARGET_NEON)
 #define HAVE_neon_vcntv8qi (TARGET_NEON)
@@ -10930,6 +10932,8 @@ extern rtx        gen_sdot_prodv8qi                                  (rtx, rtx, 
 extern rtx        gen_udot_prodv8qi                                  (rtx, rtx, rtx, rtx);
 extern rtx        gen_sdot_prodv16qi                                 (rtx, rtx, rtx, rtx);
 extern rtx        gen_udot_prodv16qi                                 (rtx, rtx, rtx, rtx);
+extern rtx        gen_usdot_prodv8qi                                 (rtx, rtx, rtx, rtx);
+extern rtx        gen_usdot_prodv16qi                                (rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_copysignfv2sf                             (rtx, rtx, rtx);
 extern rtx        gen_neon_copysignfv4sf                             (rtx, rtx, rtx);
 extern rtx        gen_neon_vcntv8qi                                  (rtx, rtx);
