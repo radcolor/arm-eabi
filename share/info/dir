@@ -16,4 +16,3 @@ File: dir,	Node: Top	This is the top of the INFO tree
 
 Software development
 * gccinstall: (gccinstall).     Installing the GNU Compiler Collection.
-* gccint: (gccint).             Internals of the GNU Compiler Collection.
