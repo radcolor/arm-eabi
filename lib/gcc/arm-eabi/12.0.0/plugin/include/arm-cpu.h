@@ -145,6 +145,7 @@ enum arch_type
   TARGET_ARCH_armv8_m_main,
   TARGET_ARCH_armv8_r,
   TARGET_ARCH_armv8_1_m_main,
+  TARGET_ARCH_armv9_a,
   TARGET_ARCH_iwmmxt,
   TARGET_ARCH_iwmmxt2,
   TARGET_ARCH_arm_none
