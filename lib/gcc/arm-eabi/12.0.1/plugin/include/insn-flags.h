@@ -179,6 +179,8 @@
 #define HAVE_probe_stack (TARGET_32BIT)
 #define HAVE_probe_stack_range (TARGET_32BIT)
 #define HAVE_arm_stack_protect_test_insn (TARGET_32BIT)
+#define HAVE_stack_protect_set_tls 1
+#define HAVE_stack_protect_test_tls 1
 #define HAVE_nop 1
 #define HAVE_trap 1
 #define HAVE_movcond_addsi (TARGET_32BIT)
@@ -199,6 +201,7 @@
 #define HAVE_force_register_use 1
 #define HAVE_arm_eh_return (TARGET_ARM)
 #define HAVE_load_tp_hard (TARGET_HARD_TP)
+#define HAVE_reload_tp_hard (TARGET_HARD_TP)
 #define HAVE_load_tp_soft_fdpic (TARGET_SOFT_TP && TARGET_FDPIC)
 #define HAVE_load_tp_soft (TARGET_SOFT_TP && !TARGET_FDPIC)
 #define HAVE_tlscall (TARGET_GNU2_TLS)
@@ -1390,20 +1393,28 @@
 #define HAVE_neon_vcmlaq_lane90v4sf (TARGET_COMPLEX)
 #define HAVE_neon_vcmlaq_lane180v4sf (TARGET_COMPLEX)
 #define HAVE_neon_vcmlaq_lane270v4sf (TARGET_COMPLEX)
-#define HAVE_neon_sdotv8qi (TARGET_DOTPROD)
-#define HAVE_neon_udotv8qi (TARGET_DOTPROD)
-#define HAVE_neon_sdotv16qi (TARGET_DOTPROD)
-#define HAVE_neon_udotv16qi (TARGET_DOTPROD)
+#define HAVE_sdot_prodv8qi (TARGET_DOTPROD)
+#define HAVE_udot_prodv8qi (TARGET_DOTPROD)
+#define HAVE_sdot_prodv16qi (TARGET_DOTPROD)
+#define HAVE_udot_prodv16qi (TARGET_DOTPROD)
 #define HAVE_neon_usdotv8qi (TARGET_I8MM)
 #define HAVE_neon_usdotv16qi (TARGET_I8MM)
 #define HAVE_neon_sdot_lanev8qi (TARGET_DOTPROD)
 #define HAVE_neon_udot_lanev8qi (TARGET_DOTPROD)
 #define HAVE_neon_sdot_lanev16qi (TARGET_DOTPROD)
 #define HAVE_neon_udot_lanev16qi (TARGET_DOTPROD)
+#define HAVE_neon_sdot_laneqv8qi (TARGET_DOTPROD)
+#define HAVE_neon_udot_laneqv8qi (TARGET_DOTPROD)
+#define HAVE_neon_sdot_laneqv16qi (TARGET_DOTPROD)
+#define HAVE_neon_udot_laneqv16qi (TARGET_DOTPROD)
 #define HAVE_neon_usdot_lanev8qi (TARGET_I8MM)
 #define HAVE_neon_sudot_lanev8qi (TARGET_I8MM)
 #define HAVE_neon_usdot_lanev16qi (TARGET_I8MM)
 #define HAVE_neon_sudot_lanev16qi (TARGET_I8MM)
+#define HAVE_neon_usdot_laneqv8qi (TARGET_I8MM)
+#define HAVE_neon_sudot_laneqv8qi (TARGET_I8MM)
+#define HAVE_neon_usdot_laneqv16qi (TARGET_I8MM)
+#define HAVE_neon_sudot_laneqv16qi (TARGET_I8MM)
 #define HAVE_neon_vqnegv8qi (TARGET_NEON)
 #define HAVE_neon_vqnegv16qi (TARGET_NEON)
 #define HAVE_neon_vqnegv4hi (TARGET_NEON)
@@ -2217,8 +2228,8 @@
 #define HAVE_neon_vfmat_lanev8bf (TARGET_BF16_SIMD)
 #define HAVE_crypto_aesmc (TARGET_CRYPTO)
 #define HAVE_crypto_aesimc (TARGET_CRYPTO)
-#define HAVE_crypto_aesd (TARGET_CRYPTO)
-#define HAVE_crypto_aese (TARGET_CRYPTO)
+#define HAVE_aes_op_protect (TARGET_CRYPTO && fix_aes_erratum_1742098)
+#define HAVE_aes_op_protect_neon_vld1v16qi (TARGET_NEON)
 #define HAVE_crypto_sha1su1 (TARGET_CRYPTO)
 #define HAVE_crypto_sha256su0 (TARGET_CRYPTO)
 #define HAVE_crypto_sha1su0 (TARGET_CRYPTO)
@@ -4497,8 +4508,10 @@
 #define HAVE_return_addr_mask (TARGET_ARM)
 #define HAVE_untyped_call (TARGET_EITHER && !TARGET_FDPIC)
 #define HAVE_untyped_return (TARGET_EITHER && !TARGET_FDPIC)
-#define HAVE_stack_protect_combined_set 1
-#define HAVE_stack_protect_combined_test 1
+#define HAVE_stack_protect_combined_set (arm_stack_protector_guard == SSP_GLOBAL)
+#define HAVE_stack_protect_combined_test (arm_stack_protector_guard == SSP_GLOBAL)
+#define HAVE_stack_protect_set (arm_stack_protector_guard == SSP_TLSREG)
+#define HAVE_stack_protect_test (arm_stack_protector_guard == SSP_TLSREG)
 #define HAVE_casesi ((TARGET_32BIT || optimize_size || flag_pic) && !target_pure_code)
 #define HAVE_arm_casesi_internal (TARGET_ARM)
 #define HAVE_indirect_jump 1
@@ -4852,48 +4865,6 @@
 #define HAVE_vlshrv8hi3 (ARM_HAVE_V8HI_ARITH && !TARGET_REALLY_IWMMXT)
 #define HAVE_vlshrv2si3 (ARM_HAVE_V2SI_ARITH && !TARGET_REALLY_IWMMXT)
 #define HAVE_vlshrv4si3 (ARM_HAVE_V4SI_ARITH && !TARGET_REALLY_IWMMXT)
-#define HAVE_vec_cmpv8qiv8qi (ARM_HAVE_V8QI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv16qiv16qi (ARM_HAVE_V16QI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv4hiv4hi (ARM_HAVE_V4HI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv8hiv8hi (ARM_HAVE_V8HI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv2siv2si (ARM_HAVE_V2SI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv4siv4si (ARM_HAVE_V4SI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv2sfv2si (ARM_HAVE_V2SF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv4sfv4si (ARM_HAVE_V4SF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv8hfv8hi (ARM_HAVE_V8HF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpv4hfv4hi (ARM_HAVE_V4HF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vec_cmpuv8qiv8qi (ARM_HAVE_V8QI_ARITH \
-   && !TARGET_REALLY_IWMMXT)
-#define HAVE_vec_cmpuv16qiv16qi (ARM_HAVE_V16QI_ARITH \
-   && !TARGET_REALLY_IWMMXT)
-#define HAVE_vec_cmpuv4hiv4hi (ARM_HAVE_V4HI_ARITH \
-   && !TARGET_REALLY_IWMMXT)
-#define HAVE_vec_cmpuv8hiv8hi (ARM_HAVE_V8HI_ARITH \
-   && !TARGET_REALLY_IWMMXT)
-#define HAVE_vec_cmpuv2siv2si (ARM_HAVE_V2SI_ARITH \
-   && !TARGET_REALLY_IWMMXT)
-#define HAVE_vec_cmpuv4siv4si (ARM_HAVE_V4SI_ARITH \
-   && !TARGET_REALLY_IWMMXT)
 #define HAVE_vcondv8qiv8qi (ARM_HAVE_V8QI_ARITH \
    && !TARGET_REALLY_IWMMXT \
    && (!false || flag_unsafe_math_optimizations))
@@ -4964,36 +4935,6 @@
    && !TARGET_REALLY_IWMMXT)
 #define HAVE_vconduv4sfv4si (ARM_HAVE_V4SF_ARITH \
    && !TARGET_REALLY_IWMMXT)
-#define HAVE_vcond_mask_v8qiv8qi (ARM_HAVE_V8QI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v16qiv16qi (ARM_HAVE_V16QI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v4hiv4hi (ARM_HAVE_V4HI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v8hiv8hi (ARM_HAVE_V8HI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v2siv2si (ARM_HAVE_V2SI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v4siv4si (ARM_HAVE_V4SI_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!false || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v2sfv2si (ARM_HAVE_V2SF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v4sfv4si (ARM_HAVE_V4SF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v8hfv8hi (ARM_HAVE_V8HF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
-#define HAVE_vcond_mask_v4hfv4hi (ARM_HAVE_V4HF_ARITH \
-   && !TARGET_REALLY_IWMMXT \
-   && (!true || flag_unsafe_math_optimizations))
 #define HAVE_vec_load_lanesoiv16qi (TARGET_NEON || TARGET_HAVE_MVE)
 #define HAVE_vec_load_lanesoiv8hi (TARGET_NEON || TARGET_HAVE_MVE)
 #define HAVE_vec_load_lanesoiv8hf (TARGET_NEON || TARGET_HAVE_MVE)
@@ -5217,6 +5158,52 @@
 #define HAVE_reduc_umax_scal_v16qi (TARGET_NEON && !BYTES_BIG_ENDIAN)
 #define HAVE_reduc_umax_scal_v8hi (TARGET_NEON && !BYTES_BIG_ENDIAN)
 #define HAVE_reduc_umax_scal_v4si (TARGET_NEON && !BYTES_BIG_ENDIAN)
+#define HAVE_vec_cmpv8qiv8qi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv16qiv16qi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv4hiv4hi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv8hiv8hi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv2siv2si (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv4siv4si (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv2sfv2si (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv4sfv4si (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv8hfv8hi (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv4hfv4hi (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpuv8qiv8qi (TARGET_NEON)
+#define HAVE_vec_cmpuv16qiv16qi (TARGET_NEON)
+#define HAVE_vec_cmpuv4hiv4hi (TARGET_NEON)
+#define HAVE_vec_cmpuv8hiv8hi (TARGET_NEON)
+#define HAVE_vec_cmpuv2siv2si (TARGET_NEON)
+#define HAVE_vec_cmpuv4siv4si (TARGET_NEON)
+#define HAVE_vcond_mask_v8qiv8qi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v16qiv16qi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v4hiv4hi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v8hiv8hi (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v2siv2si (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v4siv4si (TARGET_NEON \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v2sfv2si (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v4sfv4si (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v8hfv8hi (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vcond_mask_v4hfv4hi (TARGET_NEON \
+   && (!true || flag_unsafe_math_optimizations))
 #define HAVE_neon_vaddv2sf (TARGET_NEON)
 #define HAVE_neon_vaddv4sf (TARGET_NEON)
 #define HAVE_neon_vaddv8hf (TARGET_NEON_FP16INST)
@@ -5375,10 +5362,10 @@
 #define HAVE_cmul_conjv2sf3 (TARGET_COMPLEX && !BYTES_BIG_ENDIAN)
 #define HAVE_cmulv4hf3 (TARGET_COMPLEX && !BYTES_BIG_ENDIAN)
 #define HAVE_cmul_conjv4hf3 (TARGET_COMPLEX && !BYTES_BIG_ENDIAN)
-#define HAVE_sdot_prodv8qi (TARGET_DOTPROD)
-#define HAVE_udot_prodv8qi (TARGET_DOTPROD)
-#define HAVE_sdot_prodv16qi (TARGET_DOTPROD)
-#define HAVE_udot_prodv16qi (TARGET_DOTPROD)
+#define HAVE_neon_sdotv8qi (TARGET_DOTPROD)
+#define HAVE_neon_udotv8qi (TARGET_DOTPROD)
+#define HAVE_neon_sdotv16qi (TARGET_DOTPROD)
+#define HAVE_neon_udotv16qi (TARGET_DOTPROD)
 #define HAVE_usdot_prodv8qi (TARGET_I8MM)
 #define HAVE_usdot_prodv16qi (TARGET_I8MM)
 #define HAVE_neon_copysignfv2sf (TARGET_NEON)
@@ -5714,6 +5701,8 @@
 #define HAVE_neon_vbfcvtbf (TARGET_BF16_FP)
 #define HAVE_neon_vfmab_laneqv8bf (TARGET_BF16_SIMD)
 #define HAVE_neon_vfmat_laneqv8bf (TARGET_BF16_SIMD)
+#define HAVE_crypto_aesd (TARGET_CRYPTO)
+#define HAVE_crypto_aese (TARGET_CRYPTO)
 #define HAVE_crypto_sha1h (TARGET_CRYPTO)
 #define HAVE_crypto_sha1c (TARGET_CRYPTO)
 #define HAVE_crypto_sha1m (TARGET_CRYPTO)
@@ -5934,6 +5923,27 @@
 #define HAVE_mve_vshlcq_m_carry_uv8hi (TARGET_HAVE_MVE)
 #define HAVE_mve_vshlcq_m_carry_sv4si (TARGET_HAVE_MVE)
 #define HAVE_mve_vshlcq_m_carry_uv4si (TARGET_HAVE_MVE)
+#define HAVE_movv16bi (TARGET_HAVE_MVE)
+#define HAVE_movv8bi (TARGET_HAVE_MVE)
+#define HAVE_movv4bi (TARGET_HAVE_MVE)
+#define HAVE_vec_cmpv16qiv16bi (TARGET_HAVE_MVE \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv8hiv8bi (TARGET_HAVE_MVE \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv4siv4bi (TARGET_HAVE_MVE \
+   && (!false || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv8hfv8bi (TARGET_HAVE_MVE \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpv4sfv4bi (TARGET_HAVE_MVE \
+   && (!true || flag_unsafe_math_optimizations))
+#define HAVE_vec_cmpuv16qiv16bi (TARGET_HAVE_MVE)
+#define HAVE_vec_cmpuv8hiv8bi (TARGET_HAVE_MVE)
+#define HAVE_vec_cmpuv4siv4bi (TARGET_HAVE_MVE)
+#define HAVE_vcond_mask_v16qiv16bi (TARGET_HAVE_MVE)
+#define HAVE_vcond_mask_v8hiv8bi (TARGET_HAVE_MVE)
+#define HAVE_vcond_mask_v4siv4bi (TARGET_HAVE_MVE)
+#define HAVE_vcond_mask_v8hfv8bi (TARGET_HAVE_MVE)
+#define HAVE_vcond_mask_v4sfv4bi (TARGET_HAVE_MVE)
 extern rtx        gen_addsi3_compareV_reg                            (rtx, rtx, rtx);
 extern rtx        gen_subvsi3_intmin                                 (rtx, rtx);
 extern rtx        gen_addsi3_compareV_imm                            (rtx, rtx, rtx);
@@ -6103,6 +6113,8 @@ extern rtx        gen_blockage                                       (void);
 extern rtx        gen_probe_stack                                    (rtx);
 extern rtx        gen_probe_stack_range                              (rtx, rtx, rtx);
 extern rtx        gen_arm_stack_protect_test_insn                    (rtx, rtx, rtx);
+extern rtx        gen_stack_protect_set_tls                          (rtx, rtx);
+extern rtx        gen_stack_protect_test_tls                         (rtx, rtx);
 extern rtx        gen_nop                                            (void);
 extern rtx        gen_trap                                           (void);
 extern rtx        gen_movcond_addsi                                  (rtx, rtx, rtx, rtx, rtx, rtx);
@@ -6123,6 +6135,7 @@ extern rtx        gen_prefetch                                       (rtx, rtx, 
 extern rtx        gen_force_register_use                             (rtx);
 extern rtx        gen_arm_eh_return                                  (rtx);
 extern rtx        gen_load_tp_hard                                   (rtx);
+extern rtx        gen_reload_tp_hard                                 (rtx);
 extern rtx        gen_load_tp_soft_fdpic                             (void);
 extern rtx        gen_load_tp_soft                                   (void);
 extern rtx        gen_tlscall                                        (rtx, rtx);
@@ -7245,20 +7258,28 @@ extern rtx        gen_neon_vcmlaq_lane0v4sf                          (rtx, rtx, 
 extern rtx        gen_neon_vcmlaq_lane90v4sf                         (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_vcmlaq_lane180v4sf                        (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_vcmlaq_lane270v4sf                        (rtx, rtx, rtx, rtx, rtx);
-extern rtx        gen_neon_sdotv8qi                                  (rtx, rtx, rtx, rtx);
-extern rtx        gen_neon_udotv8qi                                  (rtx, rtx, rtx, rtx);
-extern rtx        gen_neon_sdotv16qi                                 (rtx, rtx, rtx, rtx);
-extern rtx        gen_neon_udotv16qi                                 (rtx, rtx, rtx, rtx);
+extern rtx        gen_sdot_prodv8qi                                  (rtx, rtx, rtx, rtx);
+extern rtx        gen_udot_prodv8qi                                  (rtx, rtx, rtx, rtx);
+extern rtx        gen_sdot_prodv16qi                                 (rtx, rtx, rtx, rtx);
+extern rtx        gen_udot_prodv16qi                                 (rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_usdotv8qi                                 (rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_usdotv16qi                                (rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_sdot_lanev8qi                             (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_udot_lanev8qi                             (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_sdot_lanev16qi                            (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_udot_lanev16qi                            (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_sdot_laneqv8qi                            (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_udot_laneqv8qi                            (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_sdot_laneqv16qi                           (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_udot_laneqv16qi                           (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_usdot_lanev8qi                            (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_sudot_lanev8qi                            (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_usdot_lanev16qi                           (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_sudot_lanev16qi                           (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_usdot_laneqv8qi                           (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_sudot_laneqv8qi                           (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_usdot_laneqv16qi                          (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_sudot_laneqv16qi                          (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_vqnegv8qi                                 (rtx, rtx);
 extern rtx        gen_neon_vqnegv16qi                                (rtx, rtx);
 extern rtx        gen_neon_vqnegv4hi                                 (rtx, rtx);
@@ -8072,8 +8093,8 @@ extern rtx        gen_neon_vfmab_lanev8bf                            (rtx, rtx, 
 extern rtx        gen_neon_vfmat_lanev8bf                            (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_crypto_aesmc                                   (rtx, rtx);
 extern rtx        gen_crypto_aesimc                                  (rtx, rtx);
-extern rtx        gen_crypto_aesd                                    (rtx, rtx, rtx);
-extern rtx        gen_crypto_aese                                    (rtx, rtx, rtx);
+extern rtx        gen_aes_op_protect                                 (rtx, rtx);
+extern rtx        gen_aes_op_protect_neon_vld1v16qi                  (rtx, rtx);
 extern rtx        gen_crypto_sha1su1                                 (rtx, rtx, rtx);
 extern rtx        gen_crypto_sha256su0                               (rtx, rtx, rtx);
 extern rtx        gen_crypto_sha1su0                                 (rtx, rtx, rtx, rtx);
@@ -10300,6 +10321,8 @@ extern rtx        gen_untyped_call                                   (rtx, rtx, 
 extern rtx        gen_untyped_return                                 (rtx, rtx);
 extern rtx        gen_stack_protect_combined_set                     (rtx, rtx);
 extern rtx        gen_stack_protect_combined_test                    (rtx, rtx, rtx);
+extern rtx        gen_stack_protect_set                              (rtx, rtx);
+extern rtx        gen_stack_protect_test                             (rtx, rtx, rtx);
 extern rtx        gen_casesi                                         (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_arm_casesi_internal                            (rtx, rtx, rtx, rtx);
 extern rtx        gen_indirect_jump                                  (rtx);
@@ -10549,22 +10572,6 @@ extern rtx        gen_vlshrv4hi3                                     (rtx, rtx, 
 extern rtx        gen_vlshrv8hi3                                     (rtx, rtx, rtx);
 extern rtx        gen_vlshrv2si3                                     (rtx, rtx, rtx);
 extern rtx        gen_vlshrv4si3                                     (rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv8qiv8qi                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv16qiv16qi                              (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv4hiv4hi                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv8hiv8hi                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv2siv2si                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv4siv4si                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv2sfv2si                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv4sfv4si                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv8hfv8hi                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpv4hfv4hi                                (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpuv8qiv8qi                               (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpuv16qiv16qi                             (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpuv4hiv4hi                               (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpuv8hiv8hi                               (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpuv2siv2si                               (rtx, rtx, rtx, rtx);
-extern rtx        gen_vec_cmpuv4siv4si                               (rtx, rtx, rtx, rtx);
 extern rtx        gen_vcondv8qiv8qi                                  (rtx, rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_vcondv16qiv16qi                                (rtx, rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_vcondv4hiv4hi                                  (rtx, rtx, rtx, rtx, rtx, rtx);
@@ -10591,16 +10598,6 @@ extern rtx        gen_vconduv2siv2si                                 (rtx, rtx, 
 extern rtx        gen_vconduv4siv4si                                 (rtx, rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_vconduv2sfv2si                                 (rtx, rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_vconduv4sfv4si                                 (rtx, rtx, rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v8qiv8qi                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v16qiv16qi                          (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v4hiv4hi                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v8hiv8hi                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v2siv2si                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v4siv4si                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v2sfv2si                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v4sfv4si                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v8hfv8hi                            (rtx, rtx, rtx, rtx);
-extern rtx        gen_vcond_mask_v4hfv4hi                            (rtx, rtx, rtx, rtx);
 extern rtx        gen_vec_load_lanesoiv16qi                          (rtx, rtx);
 extern rtx        gen_vec_load_lanesoiv8hi                           (rtx, rtx);
 extern rtx        gen_vec_load_lanesoiv8hf                           (rtx, rtx);
@@ -10763,6 +10760,32 @@ extern rtx        gen_reduc_umax_scal_v2si                           (rtx, rtx);
 extern rtx        gen_reduc_umax_scal_v16qi                          (rtx, rtx);
 extern rtx        gen_reduc_umax_scal_v8hi                           (rtx, rtx);
 extern rtx        gen_reduc_umax_scal_v4si                           (rtx, rtx);
+extern rtx        gen_vec_cmpv8qiv8qi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv16qiv16qi                              (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv4hiv4hi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv8hiv8hi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv2siv2si                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv4siv4si                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv2sfv2si                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv4sfv4si                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv8hfv8hi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv4hfv4hi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv8qiv8qi                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv16qiv16qi                             (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv4hiv4hi                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv8hiv8hi                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv2siv2si                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv4siv4si                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v8qiv8qi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v16qiv16qi                          (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v4hiv4hi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v8hiv8hi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v2siv2si                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v4siv4si                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v2sfv2si                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v4sfv4si                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v8hfv8hi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v4hfv4hi                            (rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_vaddv2sf                                  (rtx, rtx, rtx);
 extern rtx        gen_neon_vaddv4sf                                  (rtx, rtx, rtx);
 extern rtx        gen_neon_vaddv8hf                                  (rtx, rtx, rtx);
@@ -10921,10 +10944,10 @@ extern rtx        gen_cmulv2sf3                                      (rtx, rtx, 
 extern rtx        gen_cmul_conjv2sf3                                 (rtx, rtx, rtx);
 extern rtx        gen_cmulv4hf3                                      (rtx, rtx, rtx);
 extern rtx        gen_cmul_conjv4hf3                                 (rtx, rtx, rtx);
-extern rtx        gen_sdot_prodv8qi                                  (rtx, rtx, rtx, rtx);
-extern rtx        gen_udot_prodv8qi                                  (rtx, rtx, rtx, rtx);
-extern rtx        gen_sdot_prodv16qi                                 (rtx, rtx, rtx, rtx);
-extern rtx        gen_udot_prodv16qi                                 (rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_sdotv8qi                                  (rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_udotv8qi                                  (rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_sdotv16qi                                 (rtx, rtx, rtx, rtx);
+extern rtx        gen_neon_udotv16qi                                 (rtx, rtx, rtx, rtx);
 extern rtx        gen_usdot_prodv8qi                                 (rtx, rtx, rtx, rtx);
 extern rtx        gen_usdot_prodv16qi                                (rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_copysignfv2sf                             (rtx, rtx, rtx);
@@ -11260,6 +11283,8 @@ extern rtx        gen_vec_pack_trunc_di                              (rtx, rtx, 
 extern rtx        gen_neon_vbfcvtbf                                  (rtx, rtx);
 extern rtx        gen_neon_vfmab_laneqv8bf                           (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_neon_vfmat_laneqv8bf                           (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_crypto_aesd                                    (rtx, rtx, rtx);
+extern rtx        gen_crypto_aese                                    (rtx, rtx, rtx);
 extern rtx        gen_crypto_sha1h                                   (rtx, rtx);
 extern rtx        gen_crypto_sha1c                                   (rtx, rtx, rtx, rtx);
 extern rtx        gen_crypto_sha1m                                   (rtx, rtx, rtx, rtx);
@@ -11478,5 +11503,21 @@ extern rtx        gen_mve_vshlcq_m_carry_sv8hi                       (rtx, rtx, 
 extern rtx        gen_mve_vshlcq_m_carry_uv8hi                       (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_mve_vshlcq_m_carry_sv4si                       (rtx, rtx, rtx, rtx, rtx);
 extern rtx        gen_mve_vshlcq_m_carry_uv4si                       (rtx, rtx, rtx, rtx, rtx);
+extern rtx        gen_movv16bi                                       (rtx, rtx);
+extern rtx        gen_movv8bi                                        (rtx, rtx);
+extern rtx        gen_movv4bi                                        (rtx, rtx);
+extern rtx        gen_vec_cmpv16qiv16bi                              (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv8hiv8bi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv4siv4bi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv8hfv8bi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpv4sfv4bi                                (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv16qiv16bi                             (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv8hiv8bi                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vec_cmpuv4siv4bi                               (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v16qiv16bi                          (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v8hiv8bi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v4siv4bi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v8hfv8bi                            (rtx, rtx, rtx, rtx);
+extern rtx        gen_vcond_mask_v4sfv4bi                            (rtx, rtx, rtx, rtx);
 
 #endif /* GCC_INSN_FLAGS_H */
